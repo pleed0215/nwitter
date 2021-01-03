@@ -27,3 +27,24 @@
 - 처음에 useState로 loggedIn으로 유저 정보를 넘겨 줬는데, 이것이 문제가 뭐냐면...
 - firebase가 초기화 되는 시점과 useState가 호출되는 시점이 다르기 때문에, 그래서
 - firebase.auth 의 onAuthStateChanged 이벤트 리스너를 활용하면 괜찮다.
+- 에러 관련해서는 try catch 를 이용하여 error message를 캐하면 된다.
+
+### signInWithPopup or signInWithRedirect
+
+- 이름에서 쉽게 추측가능.
+
+### social login
+
+- 너무나 쉽다.
+
+## 3.Database
+
+### console.firebase.google.com에 가서 데이터 베이스 먼저 생성
+
+- No SQL database
+- collection sql의 테이블 같은 개념?
+
+### onSnapshot => db change observing.
+
+- nico 강의보다 그냥 공식 문서 검색해서... 해결했음.
+  https://firebase.google.com/docs/firestore/query-data/listen

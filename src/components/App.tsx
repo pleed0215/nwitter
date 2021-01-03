@@ -13,8 +13,10 @@ function App() {
   }, []);
 
   return (
-    <div className="w-screen">
-      <AppRouter isLoggedIn={Boolean(loggedIn)} />
+    <div className="w-screen flex justify-center">
+      <div className="w-full max-w-sm border border-gray-400">
+        <AppRouter isLoggedIn={Boolean(loggedIn)} />
+      </div>
     </div>
   );
 }
