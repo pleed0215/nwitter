@@ -73,7 +73,6 @@ export const Nweet: React.FC<INweetComponent> = ({
               <button className="w-10" onClick={() => onEditStart()}>
                 <FontAwesomeIcon icon={faEdit} />
               </button>
-              )
             </>
           ))}
       </div>

@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 
 interface IMessageForm {
   message: string;
+  files: File[];
 }
 
 export interface INweet {
@@ -23,8 +24,9 @@ export const Home = () => {
     reset,
   } = useForm<IMessageForm>();
   const [nweets, setNweets] = useState<INweet[]>([]);
+  const [imageData, setImageData] = useState<string | null>(null);
   const onSubmit = async () => {
-    const { message } = getValues();
+    const { message, files } = getValues();
     await firebaseFS.collection("nweets").add({
       nweet: message,
       creatorId: firebaseAuth.currentUser?.uid,
@@ -32,6 +34,17 @@ export const Home = () => {
     });
     reset();
   };
+
+  const onFileChange = () => {
+    const { files } = getValues();
+    const file = files[0];
+
+    const reader = new FileReader();
+    // @ts-ignore
+    reader.onloadend = (ev) => setImageData(ev.currentTarget.result);
+    reader.readAsDataURL(file);
+  };
+
   const getNweets = async () => {
     setNweets([]);
     const nweetsFromFS = await firebaseFS
@@ -79,19 +92,40 @@ export const Home = () => {
   return (
     <div className="w-full flex flex-col max-h-screen overflow-y-scroll">
       <div className="w-full max-w-screen-sm flex flex-col items-start mt-4 mb-4">
-        <form className="w-full flex px-2" onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col items-start w-full mr-2">
+        <div className="p-1 w-32 h-32 border border-gray-400 self-center mb-2 flex justify-center items-center">
+          {imageData && (
+            <img className="w-full h-full" src={imageData} alt="from user" />
+          )}
+        </div>
+        <form
+          className="w-full flex flex-col px-2"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <div className="flex flex-col items-start w-full mr-2 mb-2">
             <input
               className="border border-gray-400 py-3 px-2 text-lg w-full outline-none"
               ref={register()}
-              name="message"
-              type="text"
+              name="files"
+              type="file"
+              accept="image/*"
               placeholder="What's on your mind?"
+              onChange={onFileChange}
             />
           </div>
-          <button className="mx-auto text-center text-sm px-2 bg-blue-200 text-blue-400 hover:bg-blue-600 hover:text-blue-200 transition duration-200">
-            Nweet
-          </button>
+          <div className="w-full flex">
+            <div className="flex flex-col items-start w-full mr-2">
+              <input
+                className="border border-gray-400 py-3 px-2 text-lg w-full outline-none"
+                ref={register()}
+                name="message"
+                type="text"
+                placeholder="What's on your mind?"
+              />
+            </div>
+            <button className="mx-auto text-center text-sm px-2 bg-blue-200 text-blue-400 hover:bg-blue-600 hover:text-blue-200 transition duration-200">
+              Nweet
+            </button>
+          </div>
         </form>
         <div className="mt-4 px-2 w-full">
           {nweets?.length > 0 ? (

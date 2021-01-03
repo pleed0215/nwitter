@@ -48,3 +48,19 @@
 
 - nico 강의보다 그냥 공식 문서 검색해서... 해결했음.
   https://firebase.google.com/docs/firestore/query-data/listen
+
+### handling file
+
+- handling file on vanilla js/html is first time.
+
+```ts
+const onFileChange = () => {
+  const { files } = getValues();
+  const file = files[0];
+
+  const reader = new FileReader();
+  // @ts-ignore
+  reader.onloadend = (ev) => setImageData(ev.currentTarget.result);
+  reader.readAsDataURL(file);
+};
+```
