@@ -114,8 +114,8 @@ export const Home = () => {
   }, []);
 
   return (
-    <div className="w-full flex flex-col max-h-screen overflow-y-scroll">
-      <div className="w-full max-w-screen-sm flex flex-col items-start mt-4 mb-4">
+    <div className="w-full h-full flex flex-col">
+      <div className="w-full h-full max-w-screen-sm flex flex-col items-start mt-4 mb-4 ">
         <div className="p-1 w-32 h-32 border border-gray-400 self-center mb-2 flex justify-center items-center">
           {imageData && (
             <img className="w-full h-full" src={imageData} alt="from user" />
@@ -150,9 +150,9 @@ export const Home = () => {
             </button>
           </div>
         </form>
-        <div className="mt-4 px-2 w-full">
+        <div className="mt-4 px-2 w-full h-full overflow-y-scroll">
           {nweets?.length > 0 ? (
-            <div>
+            <div className="h-full">
               {nweets.map((nweet) => (
                 <Nweet key={nweet.id} {...nweet} />
               ))}
