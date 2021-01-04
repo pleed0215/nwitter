@@ -1,7 +1,8 @@
 import { Nweet } from "components/Nweet";
-import { firebaseAuth, firebaseFS } from "firebase.app";
+import { firebaseAuth, firebaseFS, firebaseStorage } from "firebase.app";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { v4 as uuidv4 } from "uuid";
 
 interface IMessageForm {
   message: string;
@@ -13,6 +14,7 @@ export interface INweet {
   creatorId: string;
   nweet: string;
   createdAt: Date;
+  imageUrl?: string | null;
 }
 
 export const Home = () => {
@@ -25,14 +27,29 @@ export const Home = () => {
   } = useForm<IMessageForm>();
   const [nweets, setNweets] = useState<INweet[]>([]);
   const [imageData, setImageData] = useState<string | null>(null);
+
   const onSubmit = async () => {
     const { message, files } = getValues();
+
+    let fileName = null;
+
+    if (imageData) {
+      fileName = uuidv4();
+      const fileRef = firebaseStorage
+        .ref()
+        .child(`${firebaseAuth.currentUser?.uid}/${fileName}`);
+      await fileRef.putString(imageData, "data_url");
+    }
+
     await firebaseFS.collection("nweets").add({
       nweet: message,
       creatorId: firebaseAuth.currentUser?.uid,
       createdAt: Date.now(),
+      imageUrl: fileName,
     });
+
     reset();
+    setImageData(null);
   };
 
   const onFileChange = () => {
@@ -52,41 +69,48 @@ export const Home = () => {
       .orderBy("createdAt", "asc")
       .get();
     nweetsFromFS.forEach((document) => {
-      const { nweet, createdAt, creatorId, id } = document.data();
-      setNweets((prev) => [{ nweet, createdAt, creatorId, id }, ...prev]);
+      const { nweet, createdAt, creatorId, id, imageUrl } = document.data();
+      setNweets((prev) => [
+        { nweet, createdAt, creatorId, id, imageUrl },
+        ...prev,
+      ]);
     });
   };
 
   useEffect(() => {
-    firebaseFS.collection("nweets").onSnapshot((snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          const { creatorId, nweet, createdAt } = change.doc.data();
-          setNweets((prev) => [
-            { id: change.doc.id, creatorId, nweet, createdAt },
-            ...prev,
-          ]);
-        }
-        if (change.type === "removed") {
-          setNweets((prev) =>
-            prev.filter((nweet) => nweet.id !== change.doc.id)
-          );
-        }
-        if (change.type === "modified") {
-          setNweets((prev) => {
-            const index = prev.findIndex((nweet) => {
-              return nweet.id === change.doc.id;
-            });
-            if (index > -1) {
-              const { nweet } = change.doc.data();
-              prev[index] = { ...prev[index], nweet };
-            }
+    firebaseFS
+      .collection("nweets")
+      //.where("creatorId", "==", firebaseAuth.currentUser?.uid)
+      .orderBy("createdAt", "asc")
+      .onSnapshot((snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "added") {
+            const { creatorId, nweet, createdAt, imageUrl } = change.doc.data();
+            setNweets((prev) => [
+              { id: change.doc.id, creatorId, nweet, createdAt, imageUrl },
+              ...prev,
+            ]);
+          }
+          if (change.type === "removed") {
+            setNweets((prev) =>
+              prev.filter((nweet) => nweet.id !== change.doc.id)
+            );
+          }
+          if (change.type === "modified") {
+            setNweets((prev) => {
+              const index = prev.findIndex((nweet) => {
+                return nweet.id === change.doc.id;
+              });
+              if (index > -1) {
+                const { nweet } = change.doc.data();
+                prev[index] = { ...prev[index], nweet };
+              }
 
-            return [...prev];
-          });
-        }
+              return [...prev];
+            });
+          }
+        });
       });
-    });
   }, []);
 
   return (
@@ -108,7 +132,6 @@ export const Home = () => {
               name="files"
               type="file"
               accept="image/*"
-              placeholder="What's on your mind?"
               onChange={onFileChange}
             />
           </div>

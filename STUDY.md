@@ -47,9 +47,12 @@
 ### onSnapshot => db change observing.
 
 - nico 강의보다 그냥 공식 문서 검색해서... 해결했음.
-  https://firebase.google.com/docs/firestore/query-data/listen
+  https://firebase.google.com/docs/firestore/
+  query-data/listen
 
-### handling file
+## 4. File Upload
+
+### 1) handling file
 
 - handling file on vanilla js/html is first time.
 
@@ -64,3 +67,43 @@ const onFileChange = () => {
   reader.readAsDataURL(file);
 };
 ```
+
+- currentTarget.result는 img src로도 사용할 수 있다. string data이지만, 브라우저는 알아서 이미지로 해석할 수 있다.
+
+### 2) Firebase Storage
+
+- database처럼 먼저 reference를 만들고 나서 데이터를 보내주면 된다.
+
+#### 1> Reference
+
+- 사용하려면 reference를 이용해야 한다.
+  > firebaseStorage.ref()
+
+#### 2> child
+
+> firebaseStorage.ref().child(path)
+
+- collection과 사용방법이 굉장히 비슷하다.
+
+#### 3> example
+
+> const fileRef = firebaseStorage.ref().child(`${firebaseAuth.currentUser?.uid}/${uuidv4()}`);
+
+#### 4> Data put,
+
+- upload는 없고 put이나 putString method가 있다.
+
+## 5. Profile
+
+### 1) Where
+
+```ts
+firebaseFS
+  .collection("nweets")
+  .where("creatorId", "==", firebaseAuth.currentUser?.uid)
+  .orderBy("createdAt", "asc");
+```
+
+위의 코드는 에러가 발생한다.
+no sql 기반이라서 그런다고 하는데... The query required an index.
+이런 에러가 나온다.

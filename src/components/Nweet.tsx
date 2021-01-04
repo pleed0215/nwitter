@@ -1,7 +1,7 @@
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { firebaseAuth, firebaseFS } from "firebase.app";
-import React, { useState } from "react";
+import { firebaseAuth, firebaseFS, firebaseStorage } from "firebase.app";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { INweet } from "routes/home";
@@ -17,13 +17,40 @@ export const Nweet: React.FC<INweetComponent> = ({
   creatorId,
   createdAt,
   nweet,
+  imageUrl,
 }) => {
   const { register, getValues, setValue, watch } = useForm<IEdit>();
   const [isEditing, setIsEditing] = useState<Boolean>(false);
   const [editText, setEditText] = useState<string>(nweet);
+  const [imagePath, setImagePath] = useState<string | null>(null);
+
+  const getImageUrl = async () => {
+    if (imageUrl) {
+      setImagePath(
+        await firebaseStorage
+          .ref()
+          .child(`${creatorId}/${imageUrl}`)
+          .getDownloadURL()
+      );
+    } else {
+      setImagePath("/noimage.png");
+    }
+  };
+
+  useEffect(() => {
+    getImageUrl();
+  }, []);
+
   const onDeleteClick = async (id: string) => {
     const ok = window.confirm("Are you sure you want to delete this nweet?");
     if (ok) {
+      if (imageUrl) {
+        await firebaseStorage
+          .ref()
+          .child(`${firebaseAuth.currentUser?.uid}/${imageUrl}`)
+          .delete();
+      }
+
       await firebaseFS.collection("nweets").doc(id).delete();
     }
   };
@@ -54,7 +81,16 @@ export const Nweet: React.FC<INweetComponent> = ({
           type="text"
         />
       ) : (
-        <div className="w-full">{nweet}</div>
+        <div className="flex items-center w-full border border-gray-400">
+          <div className=" border-r  border-gray-400  h-28 w-32 mr-2 p-1 flex justify-center items-center">
+            {imagePath ? (
+              <img className="w-full h-full" src={imagePath} alt={`${nweet}`} />
+            ) : (
+              <></>
+            )}
+          </div>
+          <div className="w-full">{nweet}</div>
+        </div>
       )}
       <div className="w-20 flex ">
         {firebaseAuth?.currentUser?.uid === creatorId &&
