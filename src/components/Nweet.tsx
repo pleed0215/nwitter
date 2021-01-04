@@ -69,7 +69,7 @@ export const Nweet: React.FC<INweetComponent> = ({
   };
 
   return (
-    <div className="w-full flex flex-start items-center py-2">
+    <div className="w-full flex items-center py-2">
       {isEditing ? (
         <input
           ref={register()}
@@ -81,15 +81,21 @@ export const Nweet: React.FC<INweetComponent> = ({
           type="text"
         />
       ) : (
-        <div className="flex items-center w-full border border-gray-400">
-          <div className=" border-r  border-gray-400  h-28 w-32 mr-2 p-1 flex justify-center items-center">
-            {imagePath ? (
-              <img className="w-full h-full" src={imagePath} alt={`${nweet}`} />
-            ) : (
-              <></>
-            )}
+        <div className="flex justify-between items-center w-full border border-gray-400">
+          <div className="flex items-start w-full">
+            <div className=" border-r  border-gray-400  h-28 w-32 mr-2 p-1 flex justify-center items-center">
+              {imagePath ? (
+                <img
+                  className="w-full h-full"
+                  src={imagePath}
+                  alt={`${nweet}`}
+                />
+              ) : (
+                <></>
+              )}
+            </div>
+            <div className="w-full">{nweet}</div>
           </div>
-          <div className="w-full">{nweet}</div>
           <div className="w-20 flex ">
             {firebaseAuth?.currentUser?.uid === creatorId &&
               (isEditing ? (
