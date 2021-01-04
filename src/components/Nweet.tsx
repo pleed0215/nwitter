@@ -33,7 +33,7 @@ export const Nweet: React.FC<INweetComponent> = ({
           .getDownloadURL()
       );
     } else {
-      setImagePath("/noimage.png");
+      setImagePath(`${process.env.PUBLIC_URL}/noimage.png`);
     }
   };
 
