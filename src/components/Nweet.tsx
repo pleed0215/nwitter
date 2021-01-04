@@ -90,28 +90,31 @@ export const Nweet: React.FC<INweetComponent> = ({
             )}
           </div>
           <div className="w-full">{nweet}</div>
+          <div className="w-20 flex ">
+            {firebaseAuth?.currentUser?.uid === creatorId &&
+              (isEditing ? (
+                <button
+                  className="ml-2 w-full p-1 text-center bg-blue-400 text-white hover:bg-blue-600 transition duration-200"
+                  onClick={() => onEditDone(id)}
+                >
+                  Done
+                </button>
+              ) : (
+                <>
+                  <button
+                    className="mr-2 w-10"
+                    onClick={() => onDeleteClick(id)}
+                  >
+                    <FontAwesomeIcon icon={faTrash} />
+                  </button>
+                  <button className="w-10" onClick={() => onEditStart()}>
+                    <FontAwesomeIcon icon={faEdit} />
+                  </button>
+                </>
+              ))}
+          </div>
         </div>
       )}
-      <div className="w-20 flex ">
-        {firebaseAuth?.currentUser?.uid === creatorId &&
-          (isEditing ? (
-            <button
-              className="ml-2 w-full p-1 text-center bg-blue-400 text-white hover:bg-blue-600 transition duration-200"
-              onClick={() => onEditDone(id)}
-            >
-              Done
-            </button>
-          ) : (
-            <>
-              <button className="mr-2 w-10" onClick={() => onDeleteClick(id)}>
-                <FontAwesomeIcon icon={faTrash} />
-              </button>
-              <button className="w-10" onClick={() => onEditStart()}>
-                <FontAwesomeIcon icon={faEdit} />
-              </button>
-            </>
-          ))}
-      </div>
     </div>
   );
 };

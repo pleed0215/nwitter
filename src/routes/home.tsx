@@ -122,7 +122,7 @@ export const Home = () => {
           )}
         </div>
         <form
-          className="w-full flex flex-col px-2"
+          className="w-full h-auto flex flex-col px-2"
           onSubmit={handleSubmit(onSubmit)}
         >
           <div className="flex flex-col items-start w-full mr-2 mb-2">
